@@ -11,6 +11,28 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="apple-touch-icon" href="favicon.png">
+  <style>
+    /* Fiyat hesaplayıcı */
+    .calc { display: grid; gap: 14px; }
+    .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .calc-grid input, .calc-grid select { padding: 9px 11px; }
+    .dur { display: flex; align-items: center; gap: 6px; }
+    .dur input { min-width: 0; }
+    .dur span { color: var(--muted); font-size: 13px; }
+    .calc-out { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 6px 14px; }
+    .cr { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; font-size: 14px; }
+    .cr em { font-style: normal; color: var(--muted); font-size: 12px; }
+    .cr.sum { border-top: 1px dashed var(--line); margin-top: 2px; padding-top: 9px; color: var(--muted); }
+    .cr.total { border-top: 1px solid var(--line); margin-top: 4px; padding: 11px 0 7px; font-size: 18px; }
+    .cr.total b { color: var(--accent-ink); font-family: var(--display); font-size: 22px; }
+    .cr.unit { color: var(--muted); padding-top: 0; }
+    .price-tag { font-size: 13px; font-weight: 600; color: var(--ink); }
+    .mat-list { display: grid; gap: 8px; }
+    .mat-row { display: grid; grid-template-columns: 1fr 130px 32px; gap: 8px; align-items: center; }
+    .mat-row input { padding: 9px 11px; }
+    .row-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    @media (max-width: 560px) { .calc-grid { grid-template-columns: 1fr; } }
+  </style>
   <script type="importmap">
   { "imports": {
       "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
@@ -53,6 +75,8 @@
       <div class="toolbar">
         <input type="text" id="search" placeholder="Ara: isim, e-posta, başlık…">
         <span class="spacer"></span>
+        <button class="btn btn-ghost btn-sm" id="calc-btn" type="button">🧮 Fiyat hesapla</button>
+        <button class="btn btn-ghost btn-sm" id="settings-btn" type="button">⚙️ Fiyat ayarları</button>
         <button class="btn btn-ghost btn-sm" id="refresh-btn" type="button">Yenile</button>
       </div>
       <div id="list-error" class="alert alert-err" hidden></div>
