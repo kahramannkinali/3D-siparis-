@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3D Baskı Siparişi</title>
+  <meta name="description" content="Özel 3D baskı ve tasarım talebi gönderin.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%231d1b19'/><path d='M8 22h16M10 18h12M12 14h8' stroke='%23e8692c' stroke-width='2.6' stroke-linecap='round'/></svg>">
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  } }
+  </script>
+  <script src="config.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <a class="brand" href="./">
+        <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#e8692c" stroke-width="2.6" stroke-linecap="round"><path d="M5 18h14M7 14h10M9 10h6"/></svg></span>
+        <span data-shop-name>3D Atölye</span>
+      </a>
+      <nav><a href="#siparis">Talep gönder</a></nav>
+    </header>
+
+    <section class="hero">
+      <div>
+        <h1>Aklındaki parçayı <em>katman katman</em> gerçeğe dönüştürelim.</h1>
+        <p class="lead" data-tagline>Hayalindeki parçayı anlat, ben tasarlayıp basayım.</p>
+      </div>
+      <ol class="steps">
+        <li><span class="n">1</span><div><b>Anlat</b><span>Ne istediğini yaz; varsa fotoğraf, çizim veya STL ekle.</span></div></li>
+        <li><span class="n">2</span><div><b>Fiyat al</b><span>Talebini inceleyip sana e-postayla fiyat ve süre bildiririm.</span></div></li>
+        <li><span class="n">3</span><div><b>Teslim al</b><span>Onaylarsan tasarlar, basar ve teslim ederim.</span></div></li>
+      </ol>
+    </section>
+
+    <main id="siparis" class="card form-card">
+      <div id="form-area">
+        <h2>Talep formu</h2>
+        <p class="sub">Ne kadar detay verirsen o kadar doğru fiyat verebilirim. Ölçüler (mm), kullanım amacı ve dayanıklılık beklentisi çok işe yarar.</p>
+
+        <div id="config-warn" class="alert alert-warn" hidden>
+          Site henüz bağlanmadı: <span class="code">config.js</span> içindeki <span class="code">SCRIPT_URL</span> değerini doldurmalısın. (Bu uyarıyı sadece kurulum bitmeden görürsün.)
+        </div>
+        <div id="form-error" class="alert alert-err" hidden></div>
+
+        <form id="order-form" novalidate>
+          <fieldset>
+            <legend>İletişim</legend>
+            <div class="grid g2">
+              <div class="field">
+                <label for="name">Ad soyad</label>
+                <input type="text" id="name" name="name" autocomplete="name" required maxlength="100">
+              </div>
+              <div class="field">
+                <label for="email">E-posta</label>
+                <input type="email" id="email" name="email" autocomplete="email" required maxlength="150">
+              </div>
+              <div class="field">
+                <label for="phone">Telefon <span class="opt">(isteğe bağlı)</span></label>
+                <input type="tel" id="phone" name="phone" autocomplete="tel" maxlength="40">
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Ürün</legend>
+            <div class="grid">
+              <div class="field">
+                <label for="title">Kısa başlık</label>
+                <input type="text" id="title" name="title" maxlength="150" placeholder="Örn: Bisiklet için telefon tutucu">
+              </div>
+              <div class="field">
+                <label for="description">Ürün açıklaması</label>
+                <textarea id="description" name="description" required maxlength="5000"
+                  placeholder="Ne istiyorsun? Yaklaşık ölçüler, nerede/nasıl kullanılacak, bir STL'de neyin değişmesini istiyorsun…"></textarea>
+              </div>
+              <div class="grid g4">
+                <div class="field">
+                  <label for="material">Malzeme</label>
+                  <select id="material" name="material"></select>
+                </div>
+                <div class="field">
+                  <label for="color">Renk <span class="opt">(isteğe bağlı)</span></label>
+                  <input type="text" id="color" name="color" maxlength="50" placeholder="Örn: siyah">
+                </div>
+                <div class="field">
+                  <label for="quantity">Adet</label>
+                  <input type="number" id="quantity" name="quantity" min="1" max="9999" value="1">
+                </div>
+                <div class="field">
+                  <label for="deadline">İstenen tarih <span class="opt">(isteğe bağlı)</span></label>
+                  <input type="date" id="deadline" name="deadline">
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Dosyalar <span style="text-transform:none;letter-spacing:0;font-weight:400">— isteğe bağlı</span></legend>
+            <div class="grid g2">
+              <div class="field">
+                <label>Görsel / çizim <span class="opt">(en fazla 3)</span></label>
+                <div class="drop" id="img-drop">
+                  <input type="file" id="images" accept="image/*" multiple aria-label="Görsel seç">
+                  <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+                  <b>Fotoğraf ekle</b>
+                  <span>Sürükle bırak veya tıkla · JPG, PNG</span>
+                </div>
+                <div class="thumbs" id="thumbs"></div>
+              </div>
+              <div class="field">
+                <label>3D model <span class="opt">(değiştirilecek dosya varsa)</span></label>
+                <div class="drop" id="model-drop">
+                  <input type="file" id="model" accept=".stl,.3mf,.obj,.step,.stp" aria-label="Model dosyası seç">
+                  <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg>
+                  <b>Model dosyası ekle</b>
+                  <span>STL, 3MF, OBJ, STEP · en fazla 25 MB</span>
+                </div>
+                <div id="model-preview"></div>
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="hp" aria-hidden="true">
+            <label for="website">Web siteniz</label>
+            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+          </div>
+
+          <div class="submit-row">
+            <label class="check">
+              <input type="checkbox" id="consent" required>
+              <span>Bilgilerimin ve dosyalarımın yalnızca bu talebin değerlendirilmesi için saklanmasını kabul ediyorum.</span>
+            </label>
+            <button type="submit" class="btn btn-primary" id="submit-btn">Talebi gönder</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="success" class="success" hidden>
+        <div class="big"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <h2>Talebin ulaştı!</h2>
+        <p>İnceleyip en kısa sürede e-postayla dönüş yapacağım. Talep numaran: <span class="code" id="order-id"></span></p>
+        <button class="btn btn-ghost" id="again-btn" type="button">Yeni talep gönder</button>
+      </div>
+    </main>
+
+    <footer>
+      <span>© <span id="year"></span> <span data-shop-name>3D Atölye</span></span>
+      <span id="contact"></span>
+    </footer>
+  </div>
+
+  <script type="module" src="js/order.js"></script>
+</body>
+</html>

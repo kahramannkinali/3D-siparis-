@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Yönetim — Siparişler</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  } }
+  </script>
+  <script src="config.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Giriş -->
+    <section id="login-view" class="card login" hidden>
+      <h1>Yönetim girişi</h1>
+      <p>Siparişleri görmek için şifreni gir.</p>
+      <div id="login-error" class="alert alert-err" hidden></div>
+      <form id="login-form">
+        <div class="field">
+          <label for="password">Şifre</label>
+          <input type="password" id="password" autocomplete="current-password" required>
+        </div>
+        <button class="btn btn-primary" type="submit" id="login-btn">Giriş yap</button>
+      </form>
+    </section>
+
+    <!-- Liste -->
+    <section id="app-view" hidden>
+      <header class="topbar">
+        <a class="brand" href="./">
+          <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#e8692c" stroke-width="2.6" stroke-linecap="round"><path d="M5 18h14M7 14h10M9 10h6"/></svg></span>
+          <span>Siparişler</span>
+        </a>
+        <nav style="display:flex;gap:16px;align-items:center">
+          <a href="./" target="_blank">Siteyi aç ↗</a>
+          <button class="btn btn-ghost btn-sm" id="logout-btn" type="button">Çıkış</button>
+        </nav>
+      </header>
+
+      <div class="counts" id="counts"></div>
+      <div class="toolbar">
+        <input type="text" id="search" placeholder="Ara: isim, e-posta, başlık…">
+        <span class="spacer"></span>
+        <button class="btn btn-ghost btn-sm" id="refresh-btn" type="button">Yenile</button>
+      </div>
+      <div id="list-error" class="alert alert-err" hidden></div>
+      <div class="orders" id="orders"></div>
+    </section>
+  </div>
+
+  <!-- Ayrıntı paneli -->
+  <div class="drawer-bg" id="drawer-bg"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-head">
+      <span class="id" id="d-id"></span>
+      <button class="btn btn-ghost btn-sm" id="close-btn" type="button">Kapat ✕</button>
+    </div>
+    <div class="drawer-body" id="d-body"></div>
+  </aside>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>
