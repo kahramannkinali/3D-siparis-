@@ -11,6 +11,17 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
+  <style>
+    /* Logo boyutu — buradaki sayıları değiştirerek ayarlayabilirsin */
+    .brand { gap: 16px; }
+    .brand-logo { width: 100px; height: 100px; object-fit: contain; border-radius: 12px; }
+    .brand-name { font-size: 30px; }
+    @media (max-width: 560px) {
+      .brand { gap: 10px; }
+      .brand-logo { width: 64px; height: 64px; }
+      .brand-name { font-size: 21px; }
+    }
+  </style>
   <script type="importmap">
   { "imports": {
       "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
@@ -23,9 +34,9 @@
   <div class="wrap">
     <header class="topbar">
       <a class="brand" href="./">
-        <img src="logo.png" alt="" style="width:100px;height:100px;object-fit:contain;border-radius:8px" onerror="this.nextElementSibling.style.display='';this.remove()">
+        <img src="logo.png" alt="" class="brand-logo" onerror="this.nextElementSibling.style.display='';this.remove()">
         <span class="brand-mark" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="#e8692c" stroke-width="2.6" stroke-linecap="round"><path d="M5 18h14M7 14h10M9 10h6"/></svg></span>
-        <span data-shop-name>Parts&amp;Prints</span>
+        <span data-shop-name class="brand-name">Parts&amp;Prints</span>
       </a>
       <nav><a href="#siparis">Talep gönder</a></nav>
     </header>
