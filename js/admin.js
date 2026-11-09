@@ -1,4 +1,5 @@
 import { api, isConfigured, base64ToBytes, formatSize, esc } from './api.js';
+import { calculatorHTML, bindCalc, guessMaterial, money, settingsHTML, matRow, readSettings } from './pricing.js';
 
 const $ = (s) => document.querySelector(s);
 const KEY = 'siparis-admin-pw';
@@ -6,6 +7,7 @@ const KEY = 'siparis-admin-pw';
 let password = '';
 let orders = [];
 let statuses = [];
+let pricing = null;
 let filter = 'Hepsi';
 const fileCache = new Map(); // fileId -> { name, type, bytes }
 
@@ -62,6 +64,7 @@ async function load(fromLogin = false) {
     const res = await api({ action: 'list', password });
     orders = res.orders;
     statuses = res.statuses;
+    pricing = res.pricing;
     $('#login-view').hidden = true;
     $('#app-view').hidden = false;
     $('#list-error').hidden = true;
@@ -127,7 +130,7 @@ function render() {
           <div class="meta">${esc(o.name)} · ${esc(o.date)}${extras ? ' · ' + extras : ''}</div>
           <div class="desc">${esc(o.description)}</div>
         </div>
-        <div class="right"><span class="badge ${stClass(o.status)}">${esc(o.status)}</span></div>
+        <div class="right"><span class="badge ${stClass(o.status)}">${esc(o.status)}</span>${o.price ? `<span class="price-tag">${esc(o.price)}</span>` : ''}</div>
       </button>`;
   }).join('');
   loadThumbs();
@@ -187,6 +190,17 @@ async function download(id) {
 // ---------- Ayrıntı paneli ----------
 let current = null;
 
+function showDrawer(headText, html) {
+  $('#d-id').textContent = headText;
+  $('#d-body').innerHTML = html;
+  $('#drawer').classList.add('open');
+  $('#drawer').setAttribute('aria-hidden', 'false');
+  $('#drawer-bg').classList.add('open');
+  $('#drawer').scrollTop = 0;
+}
+
+let lastCalc = null;
+
 function openDrawer(id) {
   current = orders.find((o) => o.id === id);
   if (!current) return;
@@ -225,6 +239,19 @@ function openDrawer(id) {
       </div>
       <div class="viewer" id="v-${esc(f.id)}" hidden style="border-radius:12px;margin-top:10px;border:1px solid var(--line)"></div>`).join('')}</div>` : ''}
     ${o.folderUrl ? `<div><a href="${esc(o.folderUrl)}" target="_blank" rel="noopener">Drive klasöründe aç ↗</a></div>` : ''}
+    ${pricing ? `<div class="manage">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
+        <div class="section-t" style="margin:0">Fiyat hesabı</div>
+        <span class="price-tag" id="d-price">${o.price ? 'Kayıtlı fiyat: ' + esc(o.price) : ''}</span>
+      </div>
+      ${calculatorHTML(pricing, { material: guessMaterial(pricing, o.material), qty: parseInt(o.quantity, 10) || 1 })}
+      <label class="check" style="color:var(--ink)"><input type="checkbox" id="d-setstatus" checked> Kaydedince durumu "Fiyat verildi" yap</label>
+      <div class="row-actions">
+        <button class="btn btn-primary btn-sm" id="d-saveprice" type="button">Fiyatı kaydet</button>
+        <a class="btn btn-ghost btn-sm" id="d-quote" href="#">Teklif e-postası hazırla</a>
+        <span id="d-pmsg" class="saved"></span>
+      </div>
+    </div>` : ''}
     <div class="manage">
       <div class="section-t" style="margin:0">Takip</div>
       <div class="field">
@@ -246,6 +273,9 @@ function openDrawer(id) {
   $('#drawer').setAttribute('aria-hidden', 'false');
   $('#drawer-bg').classList.add('open');
   $('#drawer').scrollTop = 0;
+
+  const calcEl = $('#d-body [data-calc]');
+  if (calcEl) bindCalc(calcEl, pricing, (r) => { lastCalc = r; updateQuoteLink(); });
 
   // Görselleri yükle
   document.querySelectorAll('[data-open]').forEach(async (a) => {
@@ -310,6 +340,120 @@ $('#d-body').addEventListener('click', async (e) => {
   b.textContent = 'Kaydet';
 });
 
+function calcSummary(r) {
+  const h = Math.floor(r.hours), m = Math.round((r.hours - h) * 60);
+  return `${r.materialName}, ${Math.round(r.grams)} g, ${h} sa ${m} dk, ${r.qty} adet`;
+}
+
+function updateQuoteLink() {
+  const a = $('#d-quote');
+  if (!a || !current || !lastCalc) return;
+  const r = lastCalc, o = current, c = pricing.currency;
+  const shop = window.SITE_CONFIG?.SHOP_NAME || '';
+  const h = Math.floor(r.hours / r.qty), m = Math.round((r.hours / r.qty - h) * 60);
+  const body =
+`Merhaba ${o.name},
+
+"${o.title}" talebiniz için fiyat teklifim:
+
+• Malzeme: ${r.materialName}${o.color ? ' (' + o.color + ')' : ''}
+• Adet: ${r.qty}
+• Toplam fiyat: ${money(r.total, c)}${r.qty > 1 ? ' (adet başı ' + money(r.unit, c) + ')' : ''}
+• Tahmini baskı süresi: ${h} sa ${m} dk${r.qty > 1 ? ' (adet başı)' : ''}
+
+Onaylarsanız hemen başlayabilirim.
+
+Teşekkürler,
+${shop}`;
+  a.href = `mailto:${encodeURIComponent(o.email)}?subject=${encodeURIComponent((shop ? shop + ' — ' : '') + 'Fiyat teklifi: ' + o.title)}&body=${encodeURIComponent(body)}`;
+}
+
+$('#d-body').addEventListener('click', async (e) => {
+  if (!e.target.closest('#d-saveprice') || !current || !lastCalc) return;
+  const b = $('#d-saveprice');
+  const r = lastCalc;
+  if (!r.grams && !r.hours) { pmsg('Önce gram ve süreyi gir.', true); return; }
+  const price = money(r.total, pricing.currency);
+  const date = new Date().toLocaleDateString('tr-TR');
+  const line = `Fiyat: ${price} — ${calcSummary(r)} (${date})`;
+  const noteEl = $('#d-note');
+  const note = (noteEl.value.trim() ? noteEl.value.trim() + '\n' : '') + line;
+  const payload = { action: 'update', password, id: current.id, price, note };
+  if ($('#d-setstatus').checked) payload.status = 'Fiyat verildi';
+  b.disabled = true;
+  b.innerHTML = '<span class="spinner"></span>Kaydediliyor';
+  try {
+    const res = await api(payload);
+    Object.assign(current, { status: res.order.status, note: res.order.note, price: res.order.price });
+    noteEl.value = current.note;
+    $('#d-status').value = current.status;
+    $('#d-badge').className = 'badge ' + stClass(current.status);
+    $('#d-badge').textContent = current.status;
+    $('#d-price').textContent = 'Kayıtlı fiyat: ' + current.price;
+    pmsg('Kaydedildi ✓');
+    render();
+  } catch (err) {
+    pmsg(err.message, true);
+  }
+  b.disabled = false;
+  b.textContent = 'Fiyatı kaydet';
+});
+
+function pmsg(t, err) {
+  const m = $('#d-pmsg');
+  if (!m) return;
+  m.style.color = err ? 'var(--err)' : '';
+  m.textContent = t;
+  setTimeout(() => { if (m.isConnected) m.textContent = ''; }, err ? 5000 : 2500);
+}
+
+// Siparişten bağımsız hızlı hesap
+$('#calc-btn').addEventListener('click', () => {
+  current = null;
+  showDrawer('Hızlı fiyat hesabı', `<h2>Fiyat hesapla</h2>
+    <p style="margin:-10px 0 0;color:var(--muted);font-size:14px">Slicer'daki gram ve süreyi gir. Sabit değerleri "Fiyat ayarları"ndan değiştirebilirsin.</p>
+    ${calculatorHTML(pricing)}`);
+  bindCalc($('#d-body [data-calc]'), pricing);
+});
+
+// Fiyat ayarları
+$('#settings-btn').addEventListener('click', () => {
+  current = null;
+  showDrawer('Fiyat ayarları', `<h2>Fiyat ayarları</h2>
+    <p style="margin:-10px 0 0;color:var(--muted);font-size:14px">Bunlar hesaplayıcının varsayılan değerleri. Google tarafında saklanır, her cihazda aynı olur.</p>
+    <div class="manage" id="settings-form">${settingsHTML(pricing)}
+      <div class="row-actions" style="margin-top:6px">
+        <button class="btn btn-primary btn-sm" id="s-save" type="button">Ayarları kaydet</button>
+        <span id="s-msg" class="saved"></span>
+      </div>
+    </div>`);
+});
+
+$('#d-body').addEventListener('click', async (e) => {
+  if (e.target.closest('[data-add-mat]')) {
+    $('[data-mats]').insertAdjacentHTML('beforeend', matRow());
+    $('[data-mats] .mat-row:last-child input').focus();
+    return;
+  }
+  const del = e.target.closest('[data-del-mat]');
+  if (del) { del.closest('.mat-row').remove(); return; }
+  if (!e.target.closest('#s-save')) return;
+  const b = $('#s-save'), m = $('#s-msg');
+  b.disabled = true;
+  b.innerHTML = '<span class="spinner"></span>Kaydediliyor';
+  try {
+    const res = await api({ action: 'savePricing', password, pricing: readSettings($('#settings-form')) });
+    pricing = res.pricing;
+    m.style.color = '';
+    m.textContent = 'Kaydedildi ✓';
+  } catch (err) {
+    m.style.color = 'var(--err)';
+    m.textContent = err.message;
+  }
+  b.disabled = false;
+  b.textContent = 'Ayarları kaydet';
+});
+
 function alertInline(msg) {
   const m = $('#d-msg');
   if (m) { m.style.color = 'var(--err)'; m.textContent = msg; setTimeout(() => { m.textContent = ''; m.style.color = ''; }, 5000); }
@@ -327,6 +471,7 @@ async function closeDrawer() {
     } catch {}
   }
   current = null;
+  lastCalc = null;
 }
 $('#close-btn').addEventListener('click', closeDrawer);
 $('#drawer-bg').addEventListener('click', closeDrawer);
