@@ -9,7 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%231d1b19'/><path d='M8 22h16M10 18h12M12 14h8' stroke='%23e8692c' stroke-width='2.6' stroke-linecap='round'/></svg>">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
   <script type="importmap">
   { "imports": {
       "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
@@ -22,8 +23,9 @@
   <div class="wrap">
     <header class="topbar">
       <a class="brand" href="./">
-        <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#e8692c" stroke-width="2.6" stroke-linecap="round"><path d="M5 18h14M7 14h10M9 10h6"/></svg></span>
-        <span data-shop-name>3D Atölye</span>
+        <img src="logo.png" alt="" style="width:40px;height:40px;object-fit:contain;border-radius:8px" onerror="this.nextElementSibling.style.display='';this.remove()">
+        <span class="brand-mark" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="#e8692c" stroke-width="2.6" stroke-linecap="round"><path d="M5 18h14M7 14h10M9 10h6"/></svg></span>
+        <span data-shop-name>Parts&amp;Prints</span>
       </a>
       <nav><a href="#siparis">Talep gönder</a></nav>
     </header>
@@ -152,7 +154,7 @@
     </main>
 
     <footer>
-      <span>© <span id="year"></span> <span data-shop-name>3D Atölye</span></span>
+      <span>© <span id="year"></span> <span data-shop-name>Parts&amp;Prints</span></span>
       <span id="contact"></span>
     </footer>
   </div>

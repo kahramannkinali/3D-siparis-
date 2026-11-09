@@ -9,6 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
   <script type="importmap">
   { "imports": {
       "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
@@ -37,7 +39,8 @@
     <section id="app-view" hidden>
       <header class="topbar">
         <a class="brand" href="./">
-          <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#e8692c" stroke-width="2.6" stroke-linecap="round"><path d="M5 18h14M7 14h10M9 10h6"/></svg></span>
+          <img src="logo.png" alt="" style="width:40px;height:40px;object-fit:contain;border-radius:8px" onerror="this.nextElementSibling.style.display='';this.remove()">
+        <span class="brand-mark" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="#e8692c" stroke-width="2.6" stroke-linecap="round"><path d="M5 18h14M7 14h10M9 10h6"/></svg></span>
           <span>Siparişler</span>
         </a>
         <nav style="display:flex;gap:16px;align-items:center">
