@@ -9,17 +9,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" type="image/png" href="logo.png">
-  <link rel="apple-touch-icon" href="logo.png">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
   <style>
     /* Logo boyutu — buradaki sayıları değiştirerek ayarlayabilirsin */
-    .brand { gap: 16px; }
-    .brand-logo { width: 100px; height: 100px; object-fit: contain; border-radius: 12px; }
-    .brand-name { font-size: 30px; }
+    .brand-logo { height: 84px; width: auto; display: block; }
     @media (max-width: 560px) {
-      .brand { gap: 10px; }
-      .brand-logo { width: 64px; height: 64px; }
-      .brand-name { font-size: 21px; }
+      .brand-logo { height: 46px; }
     }
   </style>
   <script type="importmap">
@@ -34,9 +30,8 @@
   <div class="wrap">
     <header class="topbar">
       <a class="brand" href="./">
-        <img src="logo.png" alt="" class="brand-logo" onerror="this.nextElementSibling.style.display='';this.remove()">
+        <img src="logo.png" alt="Parts&amp;Prints" class="brand-logo" onerror="this.nextElementSibling.style.display='';this.remove()">
         <span class="brand-mark" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="#e8692c" stroke-width="2.6" stroke-linecap="round"><path d="M5 18h14M7 14h10M9 10h6"/></svg></span>
-        <span data-shop-name class="brand-name">Parts&amp;Prints</span>
       </a>
       <nav><a href="#siparis">Talep gönder</a></nav>
     </header>
